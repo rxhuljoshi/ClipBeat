@@ -4,6 +4,9 @@ import os
 
 st.set_page_config(page_title="Clip Beat", page_icon="🎶", layout="centered")
 
+if "mode" not in st.session_state:
+    st.session_state.mode = "audio"
+
 st.title("Clip Beat")
 st.caption("Convert Instagram Reels and YouTube Shorts to Audio or Video")
 
