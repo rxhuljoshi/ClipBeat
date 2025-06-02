@@ -18,10 +18,7 @@ def clean_tmp_folder():
     if os.path.exists(tmp_dir):
         for f in os.listdir(tmp_dir):
             if f.endswith(".mp4") or f.endswith(".mp3"):
-                try:
-                    os.remove(os.path.join(tmp_dir, f))
-                except Exception as e:
-                    print(f"[ERROR] Deleting {f}: {e}")
+                os.remove(os.path.join(tmp_dir, f))
     else:
         os.makedirs(tmp_dir)
 
@@ -39,7 +36,8 @@ def get_video_title_from_json(json_data, platform):
 def download_audio(url):
     global previous_audio_file
     url = normalize_url(url)
-    clean_tmp_folder()
+    clean_tmp_folder()  # Auto-delete old files
+    os.makedirs("tmp", exist_ok=True)
 
     info_command = [
         "yt-dlp",
@@ -55,7 +53,6 @@ def download_audio(url):
             return None, None
 
         data = json.loads(result_info.stdout)
-
         is_youtube = "youtube.com" in url or "youtu.be" in url
         if is_youtube:
             title = data.get("title", f"audio_{str(uuid.uuid4())}")
@@ -89,10 +86,10 @@ def download_audio(url):
         print(f"[ERROR] {e}")
         return None, None
 
-def download_video(url, quality="bestvideo[height<=1080]+bestaudio/best"):
-    clean_tmp_folder()
-
+def download_video(url, quality="bestvideo+bestaudio/best"):
+    clean_tmp_folder()  # Auto-delete old files
     url = normalize_url(url)
+
     is_youtube = "youtube.com" in url or "youtu.be" in url
     is_instagram = "instagram.com" in url
 
