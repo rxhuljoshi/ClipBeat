@@ -36,8 +36,10 @@ def get_video_title_from_json(json_data, platform):
 def download_audio(url):
     global previous_audio_file
     url = normalize_url(url)
-    clean_tmp_folder()  # Auto-delete old files
     os.makedirs("tmp", exist_ok=True)
+
+    if previous_audio_file and os.path.exists(previous_audio_file):
+        os.remove(previous_audio_file)
 
     info_command = [
         "yt-dlp",
@@ -53,6 +55,7 @@ def download_audio(url):
             return None, None
 
         data = json.loads(result_info.stdout)
+
         is_youtube = "youtube.com" in url or "youtu.be" in url
         if is_youtube:
             title = data.get("title", f"audio_{str(uuid.uuid4())}")
@@ -87,9 +90,9 @@ def download_audio(url):
         return None, None
 
 def download_video(url, quality="bestvideo+bestaudio/best"):
-    clean_tmp_folder()  # Auto-delete old files
-    url = normalize_url(url)
+    clean_tmp_folder()
 
+    url = normalize_url(url)
     is_youtube = "youtube.com" in url or "youtu.be" in url
     is_instagram = "instagram.com" in url
 
