@@ -18,7 +18,10 @@ def clean_tmp_folder():
     if os.path.exists(tmp_dir):
         for f in os.listdir(tmp_dir):
             if f.endswith(".mp4") or f.endswith(".mp3"):
-                os.remove(os.path.join(tmp_dir, f))
+                try:
+                    os.remove(os.path.join(tmp_dir, f))
+                except Exception as e:
+                    print(f"[ERROR] Deleting {f}: {e}")
     else:
         os.makedirs(tmp_dir)
 
@@ -36,10 +39,7 @@ def get_video_title_from_json(json_data, platform):
 def download_audio(url):
     global previous_audio_file
     url = normalize_url(url)
-    os.makedirs("tmp", exist_ok=True)
-
-    if previous_audio_file and os.path.exists(previous_audio_file):
-        os.remove(previous_audio_file)
+    clean_tmp_folder()
 
     info_command = [
         "yt-dlp",
@@ -89,7 +89,7 @@ def download_audio(url):
         print(f"[ERROR] {e}")
         return None, None
 
-def download_video(url, quality="bestvideo+bestaudio/best"):
+def download_video(url, quality="bestvideo[height<=1080]+bestaudio/best"):
     clean_tmp_folder()
 
     url = normalize_url(url)
